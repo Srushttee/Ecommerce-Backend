@@ -19,17 +19,22 @@ public class AppConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
-                .cors().configurationSource(request -> {
+                // ✅ Replace deprecated .sessionManagement().sessionCreationPolicy()
+                .securityContext(securityContext -> securityContext.requireExplicitSave(false))
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+
+                // ✅ Replace deprecated .csrf().disable()
+                .csrf(csrf -> csrf.disable())
+
+                // ✅ New style for CORS config
+                .cors(cors -> cors.configurationSource(request -> {
                     CorsConfiguration cfg = new CorsConfiguration();
                     cfg.setAllowedOrigins(Arrays.asList(
                             "http://localhost:3000",
                             "http://localhost:5173",
                             "http://localhost:4200",
-                            "https://ecommerce-taupe-eta-99.vercel.app",
-                            "https://ecommerce-gk1scsuaz-raj-kashids-projects.vercel.app",
-                            "https://ecommerce-backend-production-ff66.up.railway.app"
+                            "https://ecommerce-sandy-ten.vercel.app",
+                            "https://ecommerce-backend-production-200a.up.railway.app"
                     ));
                     cfg.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
                     cfg.setAllowCredentials(true);
@@ -37,15 +42,16 @@ public class AppConfig {
                     cfg.setExposedHeaders(List.of("Authorization"));
                     cfg.setMaxAge(3600L);
                     return cfg;
-                })
-                .and()
-                .csrf().disable()
+                }))
+
+                // ✅ New style for authorization rules
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/**").permitAll()   // ✅ allow signin/signup
+                        .requestMatchers("/auth/**").permitAll()
                         .requestMatchers("/api/**").authenticated()
                         .anyRequest().permitAll()
                 )
-                // only validate JWT for protected endpoints
+
+                // ✅ Custom JWT validator filter
                 .addFilterBefore(new JwtValidator(), BasicAuthenticationFilter.class);
 
         return http.build();
