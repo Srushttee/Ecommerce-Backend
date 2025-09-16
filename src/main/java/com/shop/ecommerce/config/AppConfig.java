@@ -31,7 +31,7 @@ public class AppConfig {
                             "http://localhost:3000",
                             "http://localhost:5173",
                             "http://localhost:4200",
-                            "http://ecommerce-backend-production-3d6b.up.railway.app",
+                            "https://ecommerce-backend-production-3d6b.up.railway.app",
                             "https://ecommerce-sandy-ten.vercel.app"
                     ));
                     cfg.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
